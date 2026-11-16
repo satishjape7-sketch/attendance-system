@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.env
+.dart_tool/
+build/
+coverage/
+*.log
+.idea/
+*.iml
+android/local.properties
+ios/Pods/
+
+
+.npm-cache/
+.env.*
+!.env.example
+.flutter-plugins*

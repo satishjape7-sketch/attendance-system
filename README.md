@@ -124,8 +124,10 @@ Without `TEST_DATABASE_URL`, the PostgreSQL integration suite is explicitly skip
 
 - One shift per employee per business date; split shifts are not supported.
 - Server timestamps are authoritative. Business dates use `BUSINESS_TIMEZONE` (default `Asia/Kolkata`); instants are stored as PostgreSQL `timestamptz`.
-- An overnight open shift remains available for checkout. A second shift cannot start until it closes. A missed checkout requires operational follow-up; automated checkout and attendance corrections are not implemented.
-- Reports list recorded attendance; they do not infer absence, holidays, lateness, overtime, or payroll.
+- An overnight open shift remains available for checkout. A second shift can start after it closes. Administrators can record a missed checkout using the confirmed departure time.
+- Open **Reports** as an administrator for the daily roster, including accounts without punches. Open **Calendar** for your month, or open a user’s calendar from the daily roster. Administrators can record a daily status correction with a reason, including leave or a holiday.
+- Attendance uses a full-day threshold of 480 minutes and a half-day threshold of 240 minutes. A completed shift below the half-day threshold is Absent. A working day without a check-in stays Pending until the next business date, then becomes Absent. An unclosed shift from a previous day shows Missing Checkout. Sunday is the default weekly day off.
+- Set `ATTENDANCE_FULL_MINUTES`, `ATTENDANCE_HALF_MINUTES`, and `ATTENDANCE_WEEKLY_OFF` in the backend environment to change the defaults. Weekly off uses ISO weekdays (Monday 1 to Sunday 7, 0 to disable). Threshold changes apply when reports are computed, including for historical dates. Run the backend migrations before using the attendance screens.
 - Access tokens expire after 15 minutes. Expiry requires sign-in again. Logout, password changes, resets and employee deactivation revoke existing tokens across devices.
 - Creating new administrators is supported through the protected API. The mobile creation form creates employees. Administrators cannot be deactivated using the status endpoint.
 - Password recovery is an operator command, not an email flow. See deployment notes.

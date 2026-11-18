@@ -3,7 +3,7 @@ import 'app_controller.dart';
 import '../features/auth/login_screen.dart';
 import '../features/auth/account_screen.dart';
 import '../features/attendance/today_screen.dart';
-import '../features/attendance/history_screen.dart';
+import '../features/attendance/attendance_dashboard.dart';
 import '../features/users/users_screen.dart';
 import '../shared/widgets.dart';
 
@@ -39,8 +39,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final admin = widget.controller.user!.isAdmin;
     final pages = <Widget>[
       TodayScreen(controller: widget.controller),
-      HistoryScreen(controller: widget.controller),
-      if (admin) HistoryScreen(controller: widget.controller, report: true, key: const ValueKey('report')),
+      AttendanceDashboard(controller: widget.controller, key: const ValueKey('calendar')),
+      if (admin) AttendanceDashboard(controller: widget.controller, team: true, key: const ValueKey('report')),
       if (admin) UsersScreen(controller: widget.controller),
       AccountScreen(controller: widget.controller),
     ];
@@ -48,12 +48,12 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(title: const Text('Attend'),
         actions: [Padding(padding: const EdgeInsets.all(16), child: Text(admin ? 'ADMIN' : 'EMPLOYEE'))]),
       body: SafeArea(child: Center(child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 900), child: pages[_index]))),
+        constraints: const BoxConstraints(maxWidth: 1080), child: pages[_index]))),
       bottomNavigationBar: NavigationBar(selectedIndex: _index,
         onDestinationSelected: (value) => setState(() => _index = value),
         destinations: [
           const NavigationDestination(icon: Icon(Icons.today_outlined), label: 'Today'),
-          const NavigationDestination(icon: Icon(Icons.history), label: 'History'),
+          const NavigationDestination(icon: Icon(Icons.calendar_month_outlined), label: 'Calendar'),
           if (admin) const NavigationDestination(icon: Icon(Icons.bar_chart), label: 'Reports'),
           if (admin) const NavigationDestination(icon: Icon(Icons.people_outline), label: 'Team'),
           const NavigationDestination(icon: Icon(Icons.person_outline), label: 'Account'),

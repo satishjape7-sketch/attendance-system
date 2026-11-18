@@ -15,6 +15,9 @@ Success: `{"data": ...}`. Errors: `{"error":{"code":"...","message":"..."}}`. Va
 | POST | /attendance/check-out | Signed in | Close open shift; 200 or 409 |
 | GET | /attendance/history | Signed in | Own records; from, to, page, limit |
 | GET | /attendance/report | Admin | Team records including name/email; from, to, page, limit |
+| GET | /attendance/team-day | Admin | Daily roster, including users with no punches; optional date defaults to the current business date |
+| GET | /attendance/calendar | Signed in | Monthly attendance; optional month (YYYY-MM) and admin-only userId |
+| PUT | /attendance/correction/:userId/:date | Admin | Set a status with a reason, or send a null status for automatic calculation. Optional ISO 8601 checkOut closes an open shift. Returns 204. |
 | GET | /users | Admin | Users; page, limit |
 | POST | /users | Admin | name, email, password, role (employee default); 201 |
 | PATCH | /users/:id/status | Admin | active boolean; employees only |
@@ -22,6 +25,8 @@ Success: `{"data": ...}`. Errors: `{"error":{"code":"...","message":"..."}}`. Va
 | GET | /health/ready | Public, outside base path | Database readiness |
 
 Dates use YYYY-MM-DD, inclusive. Invalid dates, reversed ranges, and oversized pages return 400. Attendance rows contain id, user_id, work_date, check_in, check_out. Instants are ISO 8601; work_date is a calendar date.
+
+The roster and calendar return nullable punches and a status (`present`, `half_day`, `absent`, `checked_in`, `pending`, `missing_checkout`, `leave`, `holiday`, `day_off`, or `inactive`). The roster includes accounts created by the selected day, including inactive accounts. The calendar includes eligible days and days with recorded punches or corrections. Correction reasons are available to administrators. Today returns the business date and its status alongside the shift data.
 
 Example login:
 ```json

@@ -43,7 +43,7 @@ class ApiClient {
         options: Options(method: method, headers: {
           if (_token != null) 'Authorization': 'Bearer $_token',
         }));
-      return response.data == null ? {} :
+      return response.statusCode == 204 || response.data == null ? {} :
         Map<String, dynamic>.from(response.data as Map);
     } on DioException catch (error) {
       final body = error.response?.data;

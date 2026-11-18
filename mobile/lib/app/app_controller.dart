@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import '../core/api_client.dart';
 import '../features/auth/user.dart';
 import '../features/attendance/attendance_record.dart';
+import '../features/attendance/attendance_status.dart';
 
 class AppController extends ChangeNotifier {
   final ApiClient api;
@@ -64,10 +65,15 @@ class AppController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<AttendanceRecord?> today() async {
+  Future<({AttendanceRecord? record, DateTime date, AttendanceStatus? status})> today() async {
     final result = await call('/attendance/today');
-    return result['data'] == null ? null :
-      AttendanceRecord.fromJson(Map<String, dynamic>.from(result['data'] as Map));
+    final status = result['status'] as String?;
+    return (
+      record: result['data'] == null ? null :
+        AttendanceRecord.fromJson(Map<String, dynamic>.from(result['data'] as Map)),
+      date: DateTime.parse(result['today'] as String),
+      status: status == null ? null : AttendanceStatus.parse(status),
+    );
   }
   Future<void> markAttendance(bool checkout) async {
     await call('/attendance/${checkout ? 'check-out' : 'check-in'}', method: 'POST');

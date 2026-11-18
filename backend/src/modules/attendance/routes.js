@@ -4,11 +4,17 @@ import {env} from '../../config/env.js';
 import {authenticate,adminOnly} from '../../middleware/auth.js';
 import {historySchema} from '../../lib/validation.js';
 import {AppError} from '../../lib/errors.js';
+import {attendanceSummaryRoutes,businessDate,dailyRows} from './summary.js';
 export const attendanceRoutes=Router();
 attendanceRoutes.use(authenticate);
+attendanceRoutes.use(attendanceSummaryRoutes);
 attendanceRoutes.get('/today',async(req,res)=>{
- const {rows}=await pool.query("SELECT * FROM attendance WHERE user_id=$1 AND (work_date=(now() AT TIME ZONE $2)::date OR check_out IS NULL) ORDER BY check_in DESC LIMIT 1",[req.user.id,env.BUSINESS_TIMEZONE]);
- res.json({data:rows[0]??null,timezone:env.BUSINESS_TIMEZONE});
+ const today=await businessDate();
+ const [{rows},[day]]=await Promise.all([
+  pool.query('SELECT * FROM attendance WHERE user_id=$1 AND (work_date=$2::date OR check_out IS NULL) ORDER BY check_in DESC LIMIT 1',[req.user.id,today]),
+  dailyRows(today,today,req.user.id,today)
+ ]);
+ res.json({data:rows[0]??null,timezone:env.BUSINESS_TIMEZONE,today,status:day?.status??null});
 });
 attendanceRoutes.post('/check-in',async(req,res)=>{
  const {rows}=await pool.query('INSERT INTO attendance(user_id,work_date) VALUES($1,(now() AT TIME ZONE $2)::date) RETURNING *',[req.user.id,env.BUSINESS_TIMEZONE]);
